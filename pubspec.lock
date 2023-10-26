@@ -880,6 +880,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.0"
+  simple_polls:
+    dependency: "direct main"
+    description:
+      name: simple_polls
+      sha256: "5cd9304edbbd915acf6e73357fa157f655e4759ba5b379b4e2c2481c6bba48f6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.8"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -949,6 +957,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  timeago:
+    dependency: transitive
+    description:
+      name: timeago
+      sha256: "4addcda362e51f23cf7ae2357fccd053f29d59b4ddd17fb07fc3e7febb47a456"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.0"
   typed_data:
     dependency: transitive
     description:

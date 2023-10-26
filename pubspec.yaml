@@ -54,6 +54,7 @@ dependencies:
     pdf: ^3.10.4
     open_file: ^3.3.2
     path_provider: ^2.1.1
+    simple_polls: ^1.0.8
 
 dev_dependencies:
     flutter_test:

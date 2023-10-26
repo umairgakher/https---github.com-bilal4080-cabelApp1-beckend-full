@@ -6,7 +6,7 @@ import 'package:app/User/Services/paymnet_controller.dart';
 import 'package:app/User/Setting/Setting.dart';
 import 'package:app/User/Talkus/Talkus.dart';
 import 'package:app/User/TrackOrder/TrackC.dart';
-import 'package:app/User/poll/poll.dart';
+import 'package:app/User/poll/latestpoll.dart';
 import 'package:app/signin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -291,7 +291,7 @@ class _DashboardState extends State<Dashboard> {
     } else if (title == "Poll") {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Userpolls()),
+        MaterialPageRoute(builder: (context) => LatestPollScreen()),
       );
     }
   }

@@ -3,6 +3,8 @@
 import 'package:app/Admin/Bills/Bills.dart';
 import 'package:app/Admin/emplyees.dart';
 import 'package:app/Admin/holidaysreques.dart';
+import 'package:app/Admin/polls/allpolls.dart';
+import 'package:app/User/poll/latestpoll.dart';
 import 'package:app/Admin/polls/polls.dart';
 import 'package:app/screens/admin_chat_screen.dart';
 import 'package:app/signin.dart';
@@ -160,7 +162,7 @@ class _AdminDashboardState extends State<Admin_Dashboard> {
             Divider(color: Colors.grey),
             ListTile(
                 leading: Icon(
-                  Icons.poll,
+                  Icons.poll_rounded,
                   color: Colors.black,
                 ),
                 title: Text(
@@ -173,6 +175,24 @@ class _AdminDashboardState extends State<Admin_Dashboard> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Polls_admin()),
+                  );
+                }),
+            Divider(color: Colors.grey),
+            ListTile(
+                leading: Icon(
+                  Icons.polymer_outlined,
+                  color: Colors.black,
+                ),
+                title: Text(
+                  'Polls',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ViewPollsScreen()),
                   );
                 }),
             Divider(color: Colors.grey),

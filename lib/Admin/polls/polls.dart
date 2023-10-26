@@ -1,7 +1,28 @@
-// ignore_for_file: use_key_in_widget_constructors, camel_case_types, prefer_final_fields, library_private_types_in_public_api, avoid_print, prefer_const_constructors
+// ignore_for_file: unused_field, library_private_types_in_public_api, use_key_in_widget_constructors, avoid_print, camel_case_types, prefer_const_constructors, avoid_function_literals_in_foreach_calls
 
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+class PollService {
+  final CollectionReference _pollsCollection =
+      FirebaseFirestore.instance.collection('polls');
+
+  Future<void> createPoll(String question, List<String> options) async {
+    try {
+      final pollData = {
+        'question': question,
+        'options': options,
+        'votes': {},
+        "date": DateTime.now()
+      };
+
+      await _pollsCollection.add(pollData);
+    } catch (e) {
+      print('Error creating poll: $e');
+      throw Exception('Failed to create poll');
+    }
+  }
+}
 
 class Polls_admin extends StatefulWidget {
   @override
@@ -9,108 +30,14 @@ class Polls_admin extends StatefulWidget {
 }
 
 class _Polls_adminState extends State<Polls_admin> {
-  TextEditingController _questionController = TextEditingController();
-  List<TextEditingController> _answerControllers = [
-    TextEditingController(),
-    TextEditingController(),
-  ];
+  final _pollsCollection = FirebaseFirestore.instance.collection('polls');
+  final _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers = [];
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  void _createPoll() {
-    try {
-      String question = _questionController.text;
-      List<String> answers =
-          _answerControllers.map((controller) => controller.text).toList();
-
-      if (question.isEmpty) {
-        _showError('Please enter the question.');
-      } else if (answers.length < 2 || answers.length > 4) {
-        _showError('Please provide between 2 and 4 answers.');
-      } else if (answers.any((answer) => answer.isEmpty)) {
-        _showError('Please enter all answers.');
-      } else {
-        // All fields are filled, proceed to post the poll
-        createPoll(question, answers);
-
-        print('Question: $question');
-        print('Answers: $answers');
-      }
-    } catch (error, stackTrace) {
-      print('Error: $error');
-      print('Stack trace: $stackTrace');
-    }
-  }
-
-  Future<void> createPoll(String question, List<String> answers) async {
-    // Add a new poll document to the 'polls' collection
-    DocumentReference pollRef = await _firestore.collection('polls').add({
-      'question': question,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    // Add answers to the 'answers' subcollection
-    for (String answer in answers) {
-      await pollRef.collection('answers').add({
-        'text': answer,
-        'count': 0, // Initialize count to 0
-      });
-    }
-  }
-
-  void _showError(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Error'),
-          content: Text(message),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _addAnswer() {
-    if (_answerControllers.length >= 4) {
-      // Maximum answer limit reached, show a dialog
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Maximum Answers Reached'),
-            content: Text('You can add a maximum of four answers.'),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      setState(() {
-        _answerControllers.add(TextEditingController());
-      });
-    }
-  }
-
-  void _removeAnswer(int index) {
-    if (_answerControllers.length > 2) {
-      setState(() {
-        _answerControllers.removeAt(index);
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    _optionControllers.add(TextEditingController());
   }
 
   @override
@@ -118,64 +45,90 @@ class _Polls_adminState extends State<Polls_admin> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Create Poll',
+          'Create poll',
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: Color(0xff453658),
+        backgroundColor: Color(0xff392850),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: _questionController,
-                decoration: InputDecoration(
-                  labelText: 'Question',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              Text('Answers:'),
-              SizedBox(height: 8.0),
-              for (int i = 0; i < _answerControllers.length; i++)
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: TextField(
-                          controller: _answerControllers[i],
-                          decoration: InputDecoration(
-                            labelText: 'Answer ${i + 1}',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (i > 1)
-                      ElevatedButton(
-                        onPressed: () {
-                          _removeAnswer(i);
-                        },
-                        child: Text('Remove'),
-                      ),
-                  ],
-                ),
-              SizedBox(height: 16.0),
+      body: Column(
+        children: [
+          _buildPollForm(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPollForm() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _questionController,
+              decoration: InputDecoration(labelText: 'Poll Question'),
+            ),
+            Column(
+              children: _optionControllers.map((controller) {
+                return TextField(
+                  controller: controller,
+                  decoration: InputDecoration(labelText: 'Option'),
+                  onSubmitted: (_) => _addOption(),
+                );
+              }).toList(),
+            ),
+            if (_optionControllers.length <
+                3) // Display the "Add Option" button only if there are less than 3 options
               ElevatedButton(
-                onPressed: _addAnswer,
-                child: Text('Add Answer'),
+                onPressed: _addOption,
+                child: Text('Add Option'),
               ),
-              ElevatedButton(
-                onPressed: _createPoll,
-                child: Text('Post Poll'),
-              ),
-            ],
-          ),
+            ElevatedButton(
+              onPressed: _createPoll,
+              child: Text('Create Poll'),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  void _addOption() {
+    if (_optionControllers.length < 3) {
+      setState(() {
+        _optionControllers.add(TextEditingController());
+      });
+    }
+  }
+
+  Future<void> _createPoll() async {
+    final question = _questionController.text.trim();
+    if (question.isEmpty) {
+      return;
+    }
+
+    final pollOptions = _optionControllers
+        .map((controller) => controller.text.trim())
+        .where((option) => option.isNotEmpty)
+        .toList();
+
+    if (pollOptions.isEmpty) {
+      return;
+    }
+
+    final pollService = PollService();
+    await pollService.createPoll(question, pollOptions);
+
+    setState(() {
+      _questionController.clear();
+      _optionControllers.forEach((controller) => controller.clear());
+    });
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Polls_admin(),
+  ));
 }
