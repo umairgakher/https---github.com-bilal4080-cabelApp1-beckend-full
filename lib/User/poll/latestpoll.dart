@@ -1,5 +1,5 @@
 // Import necessary packages
-// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, deprecated_member_use, avoid_print, library_private_types_in_public_api, use_key_in_widget_constructors, unused_import, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, deprecated_member_use, avoid_print, library_private_types_in_public_api, use_key_in_widget_constructors, unused_import, prefer_const_constructors_in_immutables, unnecessary_null_comparison
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
