@@ -60,6 +60,7 @@ class holidaysRequestsState extends State<holidaysRequests> {
                 var status = data?['approved'];
                 var date = data?["date"];
                 var reason = data?["reason"];
+                var time = data?["time"];
                 // var status = data?["status"];
                 return Container(
                   decoration: BoxDecoration(
@@ -82,6 +83,12 @@ class holidaysRequestsState extends State<holidaysRequests> {
                       Text(
                         'Date: $date',
                         style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Divider(color: Colors.grey),
+                      SizedBox(height: 8),
+                      Text(
+                        'Time: $time',
                       ),
                       SizedBox(height: 8),
                       Divider(color: Colors.grey),

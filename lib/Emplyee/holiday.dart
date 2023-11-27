@@ -54,6 +54,7 @@ class _HolidayRequestScreenState extends State<HolidayRequestScreen> {
     if (_formKey.currentState!.validate()) {
       final holidayRequest = {
         'date': DateFormat('yyyy-MM-dd').format(selectedDate),
+        'time': DateFormat('HH:mm:ss').format(DateTime.now()),
         'reason': reason,
         'user_uid': _user!.uid,
         'approved': 0, // Initialize as not approved

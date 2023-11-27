@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, sort_child_properties_last, empty_statements, depend_on_referenced_packages
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously, avoid_print, sort_child_properties_last
 
 import 'package:app/signin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,7 +22,7 @@ class _RegScreenState extends State<RegScreen> {
 
   User? user = FirebaseAuth.instance.currentUser;
 
-  bool isPasswordVisible = false; // Track password visibility
+  bool isPasswordVisible = false;
   bool isCPasswordVisible = false;
   String selectedRadioValue = 'Option 1';
   int? driver = 0;
@@ -31,9 +31,9 @@ class _RegScreenState extends State<RegScreen> {
     setState(() {
       selectedRadioValue = value;
     });
-  } // Track confirm password visibility
+  }
 
-  _createAccount(int a) async {
+  bool _validateFields() {
     var username = usernameController.text.trim();
     var uemail = emailController.text.trim();
     var upassword = passwordController.text.trim();
@@ -52,7 +52,7 @@ class _RegScreenState extends State<RegScreen> {
         backgroundColor: Color(0xff392850),
         textColor: Colors.white,
       );
-      return;
+      return false;
     }
 
     if (!RegExp(
@@ -66,7 +66,7 @@ class _RegScreenState extends State<RegScreen> {
         backgroundColor: const Color.fromARGB(255, 7, 80, 140),
         textColor: Colors.white,
       );
-      return;
+      return false;
     }
 
     if (upassword != ucpassword) {
@@ -78,8 +78,9 @@ class _RegScreenState extends State<RegScreen> {
         backgroundColor: Color(0xff392850),
         textColor: Colors.white,
       );
-      return;
+      return false;
     }
+
     if (upassword.length < 8 ||
         !upassword.contains(RegExp(r'[A-Z]')) ||
         !upassword.contains(RegExp(r'[0-9]'))) {
@@ -89,7 +90,30 @@ class _RegScreenState extends State<RegScreen> {
               'Password must be at least 8 characters long and contain at least one capital letter and one number'),
         ),
       );
+      return false;
     }
+
+    if (uphone.length < 11) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Phone must be at least 11 digits long'),
+        ),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  void _createAccount(int a) async {
+    if (!_validateFields()) {
+      return;
+    }
+
+    var username = usernameController.text.trim();
+    var uemail = emailController.text.trim();
+    var upassword = passwordController.text.trim();
+    var uphone = uPhonenoController.text.trim();
 
     try {
       UserCredential userCredential =
@@ -132,7 +156,6 @@ class _RegScreenState extends State<RegScreen> {
                 "paid": 0,
                 "service": "Basic",
               });
-        ;
 
         Navigator.push(
           context,
@@ -140,6 +163,7 @@ class _RegScreenState extends State<RegScreen> {
         );
       }
     } catch (e) {
+      print("Error creating account: $e");
       Fluttertoast.showToast(
         msg: "Error creating account: $e",
         toastLength: Toast.LENGTH_SHORT,
@@ -152,24 +176,13 @@ class _RegScreenState extends State<RegScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _header(),
-                _inputFields(),
-                _loginInfo(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    uPhonenoController.dispose();
+    passwordController.dispose();
+    cpasswordController.dispose();
+    super.dispose();
   }
 
   Widget _header() {
@@ -228,6 +241,7 @@ class _RegScreenState extends State<RegScreen> {
         ),
         TextField(
           controller: uPhonenoController,
+          keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: "Phone no",
             fillColor: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -252,8 +266,7 @@ class _RegScreenState extends State<RegScreen> {
             suffixIcon: GestureDetector(
               onTap: () {
                 setState(() {
-                  isPasswordVisible =
-                      !isPasswordVisible; // Toggle password visibility
+                  isPasswordVisible = !isPasswordVisible;
                 });
               },
               child: Icon(
@@ -265,8 +278,7 @@ class _RegScreenState extends State<RegScreen> {
               borderSide: BorderSide.none,
             ),
           ),
-          obscureText:
-              !isPasswordVisible, // Set obscureText based on visibility state
+          obscureText: !isPasswordVisible,
         ),
         const SizedBox(
           height: 10,
@@ -281,8 +293,7 @@ class _RegScreenState extends State<RegScreen> {
             suffixIcon: GestureDetector(
               onTap: () {
                 setState(() {
-                  isCPasswordVisible =
-                      !isCPasswordVisible; // Toggle confirm password visibility
+                  isCPasswordVisible = !isCPasswordVisible;
                 });
               },
               child: Icon(
@@ -294,8 +305,7 @@ class _RegScreenState extends State<RegScreen> {
               borderSide: BorderSide.none,
             ),
           ),
-          obscureText:
-              !isCPasswordVisible, // Set obscureText based on visibility state
+          obscureText: !isCPasswordVisible,
         ),
         SizedBox(
           height: 10,
@@ -314,7 +324,7 @@ class _RegScreenState extends State<RegScreen> {
         ),
         Center(
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Text("Sign up as a Emplyee?"),
+            const Text("Sign up as an Employee?"),
             TextButton(
               onPressed: () => _createAccount(1),
               child: const Text(
@@ -346,6 +356,27 @@ class _RegScreenState extends State<RegScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Container(
+            margin: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _header(),
+                _inputFields(),
+                _loginInfo(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

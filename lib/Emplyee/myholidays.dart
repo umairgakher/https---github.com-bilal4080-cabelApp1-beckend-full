@@ -60,6 +60,7 @@ class MYholidaysState extends State<MYholidays> {
                 Map<String, dynamic>? data =
                     documents[index].data() as Map<String, dynamic>?;
                 var status = data?['approved'];
+                var time = data?["time"];
                 var date = data?["date"];
                 var reason = data?["reason"];
                 // var status = data?["status"];
@@ -84,6 +85,12 @@ class MYholidaysState extends State<MYholidays> {
                       Text(
                         'Date: $date',
                         style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Divider(color: Colors.grey),
+                      SizedBox(height: 8),
+                      Text(
+                        'Time: $time',
                       ),
                       SizedBox(height: 8),
                       Divider(color: Colors.grey),
