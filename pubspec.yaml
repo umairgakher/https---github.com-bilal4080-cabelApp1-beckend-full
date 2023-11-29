@@ -55,6 +55,7 @@ dependencies:
     open_file: ^3.3.2
     path_provider: ^2.1.1
     simple_polls: ^1.0.8
+    flutter_phone_direct_caller: ^2.1.1
 
 dev_dependencies:
     flutter_test:

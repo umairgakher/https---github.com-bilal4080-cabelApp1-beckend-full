@@ -22,44 +22,12 @@ class callemplyee extends StatefulWidget {
 
 class _BillsUserState extends State<callemplyee> {
   List<Bill> bills = [];
-  SharedPreferences? _prefs;
   String? currentMonthName;
   int? currentYear;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    _prefs = await SharedPreferences.getInstance();
-    final savedBills = _prefs?.getStringList('bills');
-
-    if (savedBills != null) {
-      bills = savedBills.map((billStr) {
-        final billData = billStr.split(';');
-        return Bill(
-          userName: billData[0],
-          amount: double.parse(billData[1]),
-          isPaid: billData[2] == 'true',
-        );
-      }).toList();
-    } else {
-      bills = [
-        Bill(userName: 'Sample User 1', amount: 50.0, isPaid: true),
-        Bill(userName: 'Sample User 2', amount: 75.0, isPaid: false),
-      ];
-    }
-
-    setState(() {});
-  }
-
-  Future<void> _saveData() async {
-    final billStrings = bills.map((bill) {
-      return '${bill.userName};${bill.amount};${bill.isPaid}';
-    }).toList();
-    await _prefs?.setStringList('bills', billStrings);
   }
 
   @override
@@ -69,7 +37,7 @@ class _BillsUserState extends State<callemplyee> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Color(0xff453658),
         title: Text(
-          'callemplyee Salaries',
+          'Call To Employee ',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -131,7 +99,10 @@ class _BillsUserState extends State<callemplyee> {
                         IconButton(
                           icon: Icon(Icons.call),
                           onPressed: () {
-                            _makePhoneCall(phoneno);
+                            Uri dialnumber =
+                                Uri(scheme: 'tel', path: "${data?['uPhone']}");
+                            callnumber(dialnumber);
+                            // _makePhoneCall(phoneno);
                           },
                         )
                       ],
@@ -152,158 +123,11 @@ class _BillsUserState extends State<callemplyee> {
     );
   }
 
-  void _makePhoneCall(String? phoneNumber) async {
-    if (phoneNumber != null && await canLaunch('tel:$phoneNumber')) {
-      await launch('tel:$phoneNumber');
-    } else {
-      // Handle error: Unable to launch the phone dialer
-      print('Error: Unable to make the phone call');
-    }
+  callnumber(Uri dialnumber) async {
+    await launchUrl(dialnumber);
   }
 
-  void _showEditDialog(String index, String name, double total) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Edit salary '),
-          content: Text('Change payment status for ?'),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text('Add salary '),
-              onPressed: () {
-                _addNewBill(index, name);
-              },
-            ),
-            TextButton(
-              child: Text('Mark as Paid'),
-              onPressed: () async {
-                await FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(index)
-                    .update({"paid": 1});
-                setState(() {});
-                Navigator.pop(context);
-                setState(() {
-                  final now = DateTime.now();
-                  currentYear = now.year;
-                  final currentMonth = now.month;
-                  final monthNames = [
-                    '', // Index 0 is left empty since months are 1-based
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November',
-                    'December'
-                  ];
-                  currentMonthName = monthNames[currentMonth];
-                  print('Current Month: $currentMonthName');
-                });
-                await FirebaseFirestore.instance
-                    .collection("salary")
-                    .doc()
-                    .set({
-                  "month": currentMonthName,
-                  "year": currentYear,
-                  "salary": total,
-                  "paid": "paid",
-                  "name": name,
-                  "empId": index,
-                });
-              },
-            ),
-            TextButton(
-              child: Text('Mark as Unpaid'),
-              onPressed: () async {
-                await FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(index)
-                    .update({"paid": 0});
-                setState(() {});
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteBill(int index) {
-    setState(() {
-      bills.removeAt(index);
-    });
-  }
-
-  void _addNewBill(String index, String name) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        double amount = 0.0;
-
-        return AlertDialog(
-          title: Text('Add New salary '),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(name),
-              SizedBox(
-                height: 3,
-              ),
-              TextField(
-                onChanged: (value) {
-                  amount = double.tryParse(value) ?? .0;
-                },
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Amount '),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text('Add salary  '),
-              onPressed: () async {
-                final userDoc = await FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(index)
-                    .get();
-
-                if (mounted) {
-                  // Check if the widget is still active
-                  if (userDoc.exists) {
-                    await FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(index)
-                        .update({"salary": amount});
-
-                    setState(
-                        () {}); // Call setState if the widget is still active
-                  }
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _saveData(); // Save data before disposing the state
-    super.dispose();
-  }
-
-  canLaunch(String s) {}
+  // directcall() async {
+  //   await FlutterPhoneDirectCaller.callNumber('1234567890');
+  // }
 }
