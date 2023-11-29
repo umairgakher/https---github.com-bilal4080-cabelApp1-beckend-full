@@ -7,6 +7,9 @@ class userpayment {
   String? uid;
   int? price;
   int check = 1;
+  String? phone;
+  String? email;
+  String? username;
   factory userpayment() {
     return _session;
   }

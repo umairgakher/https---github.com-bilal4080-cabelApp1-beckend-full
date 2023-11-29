@@ -1,9 +1,9 @@
 // Import necessary packages
-// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, deprecated_member_use, avoid_print, library_private_types_in_public_api, use_key_in_widget_constructors, unused_import, prefer_const_constructors_in_immutables, unnecessary_null_comparison
+// ignore_for_file: prefer_interpolation_to_compose_strings, prefer_const_constructors, prefer_final_fields, deprecated_member_use, avoid_print, library_private_types_in_public_api, use_key_in_widget_constructors, unused_import, prefer_const_constructors_in_immutables, unnecessary_null_comparison, unused_local_variable
 
+// Import necessary packages
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -129,25 +129,39 @@ class PollCard extends StatelessWidget {
           Column(
             children: poll.options.map((option) {
               final userHasVoted = poll.userVotes.containsKey(user!.uid);
+              final votedOption = poll.userVotes[user.uid];
+              print("voted option: $votedOption");
 
               return ListTile(
                 title: Text(option),
-                trailing: userHasVoted
-                    ? Icon(Icons.done,
-                        color: Colors
-                            .green) // Display a "Done" icon if the user has voted
-                    : checkuser == 0
-                        ? IconButton(
-                            icon: Icon(Icons.thumb_up),
-                            onPressed: () => _vote(poll.id, option),
-                          )
-                        : Text('Votes: ${poll.votes[option]}'),
+                trailing: _buildTrailingWidget(
+                    userHasVoted, votedOption, option, poll.id),
               );
             }).toList(),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildTrailingWidget(
+      bool userHasVoted, dynamic votedOption, String option, String pollId) {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (userHasVoted) {
+      if (votedOption == option) {
+        return Icon(Icons.done, color: Colors.green);
+      } else {
+        return Icon(Icons.cancel_outlined, color: Colors.red);
+      }
+    } else if (checkuser == 0) {
+      return IconButton(
+        icon: Icon(Icons.thumb_up),
+        onPressed: () => _vote(pollId, option),
+      );
+    } else {
+      return Text('Votes: ${poll.votes[option]}');
+    }
   }
 
   void _vote(String pollId, String option) async {

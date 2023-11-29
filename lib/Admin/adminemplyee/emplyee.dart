@@ -1,8 +1,9 @@
-// ignore_for_file: file_names, camel_case_types, library_private_types_in_public_api, prefer_const_constructors, unused_local_variable, unused_element, use_build_context_synchronously, avoid_print
+// ignore_for_file: file_names, camel_case_types, library_private_types_in_public_api, prefer_const_constructors, unused_local_variable, unused_element, use_build_context_synchronously, avoid_print, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Bill {
   final String userName;
@@ -12,14 +13,14 @@ class Bill {
   Bill({required this.userName, required this.amount, this.isPaid = false});
 }
 
-class employee extends StatefulWidget {
-  const employee({Key? key}) : super(key: key);
+class callemplyee extends StatefulWidget {
+  const callemplyee({Key? key}) : super(key: key);
 
   @override
   _BillsUserState createState() => _BillsUserState();
 }
 
-class _BillsUserState extends State<employee> {
+class _BillsUserState extends State<callemplyee> {
   List<Bill> bills = [];
   SharedPreferences? _prefs;
   String? currentMonthName;
@@ -68,7 +69,7 @@ class _BillsUserState extends State<employee> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Color(0xff453658),
         title: Text(
-          'Employee Salaries',
+          'callemplyee Salaries',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -104,8 +105,8 @@ class _BillsUserState extends State<employee> {
                 Map<String, dynamic>? data =
                     documents[index].data() as Map<String, dynamic>?;
                 var name = data?['username'];
-                var paid = data?["paid"];
-                var total = data?['salary'];
+                var email = data?["email"];
+                var phoneno = data?['uPhone'];
                 // var status = data?["status"];
                 return Card(
                   elevation: 4, // Control the shadow or elevation of the card
@@ -128,10 +129,9 @@ class _BillsUserState extends State<employee> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(Icons
-                              .edit), // Use Icon widget to specify the icon
+                          icon: Icon(Icons.call),
                           onPressed: () {
-                            _showEditDialog(document.id, name, total);
+                            _makePhoneCall(phoneno);
                           },
                         )
                       ],
@@ -139,10 +139,8 @@ class _BillsUserState extends State<employee> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          paid == 0 ? "Not paid" : "Paid",
-                        ),
-                        Text("Total: $total")
+                        Text("Email:$email"),
+                        Text("Phone no: $phoneno")
                       ],
                     ),
                     // Add other ListTile properties as needed
@@ -152,6 +150,15 @@ class _BillsUserState extends State<employee> {
         },
       ),
     );
+  }
+
+  void _makePhoneCall(String? phoneNumber) async {
+    if (phoneNumber != null && await canLaunch('tel:$phoneNumber')) {
+      await launch('tel:$phoneNumber');
+    } else {
+      // Handle error: Unable to launch the phone dialer
+      print('Error: Unable to make the phone call');
+    }
   }
 
   void _showEditDialog(String index, String name, double total) {
@@ -297,7 +304,6 @@ class _BillsUserState extends State<employee> {
     _saveData(); // Save data before disposing the state
     super.dispose();
   }
+
+  canLaunch(String s) {}
 }
-
-
-//herrergghjghjkghjhj

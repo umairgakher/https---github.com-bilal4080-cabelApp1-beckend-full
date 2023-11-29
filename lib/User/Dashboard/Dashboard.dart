@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_new, file_names, use_key_in_widget_constructors, prefer_const_constructors_in_immutables, library_private_types_in_public_api, deprecated_member_use, prefer_const_constructors, avoid_print, unused_element, no_leading_underscores_for_local_identifiers
 
 import 'package:app/User/Complaint/complaintus.dart';
+import 'package:app/User/Dashboard/paymentpic.dart';
 import 'package:app/User/SelfService/Selfservice.dart';
 import 'package:app/User/Services/paymnet_controller.dart';
 import 'package:app/User/Setting/Setting.dart';
@@ -50,6 +51,10 @@ class _DashboardState extends State<Dashboard> {
     title: "Poll",
     img: "images/poll.png",
   );
+  Items item8 = new Items(
+    title: "Payment picture",
+    img: "images/ss.png",
+  );
   User? user;
   String? username;
   String? email;
@@ -76,6 +81,8 @@ class _DashboardState extends State<Dashboard> {
           service = data["service"];
           bill = data["bill"];
           paid = data["paid"];
+          userpayment().email = data["email"];
+          userpayment().username = data["username"];
 
           userpayment().bill = bill;
           userpayment().service = service;
@@ -103,7 +110,8 @@ class _DashboardState extends State<Dashboard> {
       item4,
       item5,
       item6,
-      item7
+      item7,
+      item8
     ]; // Add all items here
     var color = 0xff453658;
     return Scaffold(
@@ -292,6 +300,11 @@ class _DashboardState extends State<Dashboard> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => LatestPollScreen()),
+      );
+    } else if (title == "Payment picture") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PaymentPic()),
       );
     }
   }

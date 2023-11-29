@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, library_private_types_in_public_api, camel_case_types, prefer_const_constructors, use_key_in_widget_constructors, non_constant_identifier_names, avoid_print, unrelated_type_equality_checks, unused_local_variable, unnecessary_brace_in_string_interps
 
 import 'package:app/Admin/Bills/Bills.dart';
+import 'package:app/Admin/adminemplyee/emplyee.dart';
 import 'package:app/Admin/emplyees.dart';
 import 'package:app/Admin/holidaysreques.dart';
 import 'package:app/Admin/polls/allpolls.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'Help/admin_help.dart';
+import 'transaction/transactions.dart';
 
 class Admin_Dashboard extends StatefulWidget {
   const Admin_Dashboard({super.key});
@@ -157,6 +159,25 @@ class _AdminDashboardState extends State<Admin_Dashboard> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const employee()),
+                  );
+                }),
+            Divider(color: Colors.grey),
+            ListTile(
+                leading: Icon(
+                  Icons.picture_in_picture_outlined,
+                  color: Colors.black,
+                ),
+                title: Text(
+                  'Payment picture',
+                  style: TextStyle(
+                    color: Colors.black,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TransactionsScreen()),
                   );
                 }),
             Divider(color: Colors.grey),
@@ -376,6 +397,17 @@ class _AdminDashboardState extends State<Admin_Dashboard> {
                             },
                             child: Text('Resolved'),
                           ),
+                          SizedBox(width: 8),
+                          IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const callemplyee()),
+                                );
+                              },
+                              icon: Icon(Icons.call))
                         ],
                       ),
                     ],
